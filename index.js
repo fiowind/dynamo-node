@@ -6,17 +6,23 @@ const getPromise = func => (method, params) => new Promise((resolve, reject) => 
 });
 
 // Exports DynamoDB function that returns an object of methods
-module.exports = (region = 'eu-central-1', configPath) => {
-  AWS.config.update({ region });
+module.exports = (config) => {
+  AWS.config.update({ region: config.region });
   if (process.env.DYNAMO_ENV === 'test') {
     AWS.config.update({
       apiVersion: '2012-08-10',
-      accessKeyId: 'test',
-      secretAccessKey: 'test',
-      endpoint: process.env.DYNAMO_URI || 'http://localhost:8000',
+      accessKeyId: process.env.DYNAMO_ENV,
+      secretAccessKey: process.env.DYNAMO_ENV,
+      endpoint: 'http://localhost:8000',
     });
-  } else if (configPath) {
-    AWS.config.loadFromPath(configPath);
+  } else if (config) {
+    if (process.env.DYNAMO_ENV === 'test') {
+      AWS.config.update({
+        apiVersion: '2018-12-10',
+        accessKeyId: config.accessKeyId,
+        secretAccessKey: config.secretAccessKey
+      });
+    }
   }
 
   const dynamoDB = new AWS.DynamoDB();
