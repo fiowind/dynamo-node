@@ -36,7 +36,7 @@
     "dynamodb orm",
     "dynamo orm"
   ],
-  "author": "Abdullah Uzun",
+  "author": "fio",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/AbdullahZN/dynamo-node/issues"
