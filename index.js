@@ -6,29 +6,26 @@ const getPromise = func => (method, params) => new Promise((resolve, reject) => 
 });
 
 // Exports DynamoDB function that returns an object of methods
-module.exports = (config) => {
-  AWS.config.update({ region: config.region });
-  if (process.env.DYNAMO_ENV === 'test') {
-    AWS.config.update({
-      apiVersion: '2012-08-10',
-      accessKeyId: process.env.DYNAMO_ENV,
-      secretAccessKey: process.env.DYNAMO_ENV,
-      endpoint: 'http://localhost:8000',
-    });
-  } else if (config) {
-    if (process.env.DYNAMO_ENV === 'test') {
-      AWS.config.update({
-        apiVersion: '2018-12-10',
-        accessKeyId: config.accessKeyId,
-        secretAccessKey: config.secretAccessKey
-      });
+module.exports = (conf) => {
+  AWS.config.update({ region: 'ap-northeast-1' });
+
+  AWS.config.update(conf);
+
+  AWS.CredentialProviderChain.defaultProviders = [
+    function () { return new AWS.EnvironmentCredentials('AWS'); },
+    function () { return new AWS.EnvironmentCredentials('AMAZON'); },
+    function () { return new AWS.SharedIniFileCredentials(); },
+    function () {
+      // if AWS_CONTAINER_CREDENTIALS_RELATIVE_URI is set
+      if(process.env.AWS_CONTAINER_CREDENTIALS_RELATIVE_URI) {
+        return new AWS.ECSCredentials();
+      } else {
+        return new AWS.EC2MetadataCredentials();
+      }
     }
-  }
+  ]
 
   const dynamoDB = new AWS.DynamoDB();
-  if (!dynamoDB.config.credentials) {
-    throw new Error('Can not load AWS credentials');
-  }
 
   const docClient = new AWS.DynamoDB.DocumentClient();
   const db = getPromise(dynamoDB);
