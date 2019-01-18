@@ -1,5 +1,5 @@
 {
-  "name": "@bijie/dynamo-node1",
+  "name": "@bijie/dynamo-node",
   "version": "1.2.0",
   "description": "most handy DynamoDB mapper yet， forked from dynamo-node",
   "main": "dynamoDB.js",
